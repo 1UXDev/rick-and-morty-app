@@ -21,7 +21,7 @@
             placeholder="search characters"
             aria-label="character name"
           />
-          <button class="search-bar__button" aria-label="search for character">
+          <button class="search-bar__button" aria-label="search for character" data-js="search_bar__button">
             <img
               class="search-bar__icon"
               src="assets/magnifying-glass.png"
@@ -56,12 +56,13 @@
       </ul>
     </main>
     <nav class="navigation" data-js="navigation">
-      <button class="button button--prev" data-js="button_prev" id="button_prev">
+      <button class="button button--prev" data-js="button_prev" id="button_prev" value="1">
         previous
       </button>
       <span class="navigation__pagination" data-js="pagination">1 / 20</span>
       <button class="button button--next" data-js="button_next" id="button_next">next</button>
     </nav>
+    <script type="module" src="./index.js"></script>
+    <script type="module" src="./components/card/card.js"></script>
   </body>
-  <script type="module" src="./index.js"></script>
 </html>

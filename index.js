@@ -1,8 +1,9 @@
-import { createCharacterCard } from "./components/card/card.js";
+import { createCharacterCard} from "./components/card/card.js";
+// import {SearchBar,SearchQuery} from "./components/search-bar/search-bar.js"
 const cardContainer = document.querySelector('[data-js="card-container"]');
 const button_prev = document.querySelector('[data-js="button_prev"]');
+const search_bar__button = document.querySelector('[data-js="search_bar__button"]');
 const button_next = document.querySelector('[data-js="button_next"]');
-
 const searchBarContainer = document.querySelector('[data-js="search-bar-container"]');
 const searchBar = document.querySelector('[data-js="search-bar"]');
 const navigation = document.querySelector('[data-js="navigation"]');
@@ -11,52 +12,56 @@ const nextButton = document.querySelector('[data-js="button-next"]');
 const pagination = document.querySelector('[data-js="pagination"]');
 
 
+SearchBar();
+let _navigate_number = Math.floor(Math.random() *100) + 1 ;
+let page = 1;const maxPage = 20;
 
-let _navigate_number = Math.floor(Math.random() * 1000) + 1 ;
-let page = 1;
-const searchQuery = "";
-const maxPage = 20;
 
-createCharacterCard(_navigate_number,page);
-button_prev.addEventListener("click",(event)=> {
-    page =page-1;
-    pagination.innerHTML = page + "/20" ;
-    _navigate_number =_navigate_number -1 ;
-    createCharacterCard(_navigate_number);
-    
-    if(page ===1)
-    {
-    //button_prev.setAttribute('class', 'button disabled');
+     button_prev.addEventListener("click",(event)=> {
     document.getElementById("button_prev").disabled = true;
-    _navigate_number =_navigate_number +1 ; 
+    if(page !==1)
+    {
+        page =page-1;
+        pagination.innerHTML =  page + "/20" ;
+        _navigate_number =_navigate_number -1 ;
+        createCharacterCard(_navigate_number,SearchQuery);
+        document.getElementById("button_prev").disabled = false;
+       
+    }
+    else
+    {
+        button_prev.setAttribute('class', 'button disabled');
+        document.getElementById("button_prev").disabled = true;
     }
 
     
 });
-createCharacterCard(_navigate_number);
+createCharacterCard(_navigate_number,SearchQuery);
 button_next.addEventListener("click",(event)=> {
+    document.getElementById("button_prev").disabled = false;
 
-   
-
-    pagination.innerHTML = page + "/20" ;
-    _navigate_number =_navigate_number +1 ;
-    createCharacterCard(_navigate_number);
-    page =page+1;
-    if(maxPage === 20)
+    
+    if(page !==20)
     {
-    button_prev.setAttribute('class', 'button disabled');
-    _navigate_number =_navigate_number -1 ;
-    document.getElementById("button_prev").disabled = true;  
+        page =page+1;
+        pagination.innerHTML =  page + "/20" ;
+        _navigate_number =_navigate_number + 1 ;
+        createCharacterCard(_navigate_number,SearchQuery);
+        document.getElementById("button_prev").disabled = false;
+       
     }
+    else
+    {
+        button_prev.setAttribute('class', 'button disabled');
+        
+    }
+
 });
-// States
 
 
+search_bar__button.addEventListener("submit",(event)=> {
+  
+  console.log("sam");
+});
 
-fetchCharacters ()
-{
-   const response = await fetch("https://rickandmortyapi.com/api/character/");
-   
-   const jsonData =  await response.json();
- 
-}
+
