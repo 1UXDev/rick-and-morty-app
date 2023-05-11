@@ -1,62 +1,197 @@
-import { createCharacterCard } from "./components/card/card.js";
-const cardContainer = document.querySelector('[data-js="card-container"]');
-const button_prev = document.querySelector('[data-js="button_prev"]');
-const button_next = document.querySelector('[data-js="button_next"]');
+const card__image = document.querySelector('[data-js="card__image"]');
+const card__title = document.querySelector('[data-js="card__title"]');
+const card__info_status = document.querySelector(
+  '[data-js="card__info_status"]'
+);
+const card__info_type = document.querySelector('[data-js="card__info_type"]');
+const card__info_Occurrences = document.querySelector(
+  '[data-js="card__info_Occurrences"]'
+);
+const ul = document.querySelector('[data-js="card-container"]');
 
-const searchBarContainer = document.querySelector('[data-js="search-bar-container"]');
-const searchBar = document.querySelector('[data-js="search-bar"]');
-const navigation = document.querySelector('[data-js="navigation"]');
-const prevButton = document.querySelector('[data-js="button-prev"]');
-const nextButton = document.querySelector('[data-js="button-next"]');
+// Nav Buttons
+let page = 1;
 const pagination = document.querySelector('[data-js="pagination"]');
 
+// Generating Cards
+export async function generateCards() {
+  console.log(page);
+  ul.innerHTML = "";
+  const response = await fetch(
+    `https://rickandmortyapi.com/api/character/?page=${page}`
+  );
+  const jsonData = await response.json();
+  // creating the cards from each of the objects holding the characters
+  for (let object of jsonData.results) {
+    let li = document.createElement("li");
+    li.classList.add("card");
+    li.innerHTML = `
+    <div class="card__image-container" data-js="card__image-container">
+  <img
+    class="card__image"
+    src="${object.image}"
+    alt="Picture of ${object.name}"
+    data-js="card__image"
+  />
+  <div class="card__image-gradient"></div>
+</div>
+<div class="card__content">
+  <h2 class="card__title" data-js="card__title">${object.name}</h2>
+  <dl class="card__info" data-js="card__info">
+    <dt class="card__info-title" >Status</dt>
+    <dd class="card__info-description" data-js="card__info_status">${object.status}</dd>
+    <dt class="card__info-title">Type</dt>
+    <dd class="card__info-description" data-js="card__info_type">${object.type}</dd>
+    <dt class="card__info-title">Occurrences</dt>
+    <dd class="card__info-description" data-js="card__info_Occurrences">${object.episode.length}</dd>
+  </dl>
+</div>
+    `;
+    ul.append(li);
+  }
+}
+generateCards();
 
+// Navigation Buttons -----------------------------------------------------
+let button_prev = document.getElementById("button_prev");
+let button_next = document.getElementById("button_next");
 
-let _navigate_number = Math.floor(Math.random() * 1000) + 1 ;
-let page = 1;
-const searchQuery = "";
-const maxPage = 20;
-
-createCharacterCard(_navigate_number,page);
-button_prev.addEventListener("click",(event)=> {
-    page =page-1;
-    pagination.innerHTML = page + "/20" ;
-    _navigate_number =_navigate_number -1 ;
-    createCharacterCard(_navigate_number);
-    
-    if(page ===1)
-    {
-    //button_prev.setAttribute('class', 'button disabled');
+button_prev.addEventListener("click", (event) => {
+  document.getElementById("button_prev").disabled = true;
+  if (page !== 1) {
+    page = page - 1;
+    pagination.innerHTML = page + " / " + 20;
+    document.getElementById("button_prev").disabled = false;
+  } else {
+    button_prev.setAttribute("class", "button disabled");
     document.getElementById("button_prev").disabled = true;
-    _navigate_number =_navigate_number +1 ; 
-    }
-
-    
+  }
+  generateCards();
 });
-createCharacterCard(_navigate_number);
-button_next.addEventListener("click",(event)=> {
 
-   
-
-    pagination.innerHTML = page + "/20" ;
-    _navigate_number =_navigate_number +1 ;
-    createCharacterCard(_navigate_number);
-    page =page+1;
-    if(maxPage === 20)
-    {
-    button_prev.setAttribute('class', 'button disabled');
-    _navigate_number =_navigate_number -1 ;
-    document.getElementById("button_prev").disabled = true;  
-    }
+button_next.addEventListener("click", (event) => {
+  document.getElementById("button_prev").disabled = false; //This enables prevbutton when next is clicked
+  if (page !== 20 - 1) {
+    page = page + 1;
+    pagination.innerHTML = page + " / " + 20;
+    document.getElementById("button_next").disabled = false;
+  } else {
+    button_prev.setAttribute("class", "button disabled");
+    document.getElementById("button_next").disabled = true;
+  }
+  generateCards();
 });
-// States
 
+// Search Bar -------------------------------------------------------------
+let SearchQuery = "";
 
+export function SearchBar() {
+  const searchBarContainer = document.querySelector(
+    '[data-js="search-bar-container"]'
+  );
+  const searchBarForm = document.querySelector(`[data-js="search-bar"]`);
 
-fetchCharacters ()
-{
-   const response = await fetch("https://rickandmortyapi.com/api/character/");
-   
-   const jsonData =  await response.json();
- 
+  searchBarForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
+    generateSearchResults(SearchQuery);
+    searchBarForm.firstChild.nextElementSibling.value = "";
+    page = 1;
+    return;
+  });
+
+  searchBarForm.addEventListener("input", (e) => {
+    e.preventDefault();
+    SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
+    return;
+  });
+}
+SearchBar();
+
+export async function generateSearchResults(value) {
+  ul.innerHTML = "";
+  // looping through the 20 pages of the API
+  for (let i = 1; i <= 20; i++) {
+    const response = await fetch(
+      `https://rickandmortyapi.com/api/character/?page=${i}`
+    );
+    const jsonData = await response.json();
+
+    jsonData.results.forEach((object) => {
+      if (object.name.toLowerCase().includes(value.toLowerCase())) {
+        console.log(object.name);
+        generateSearchResultsCards(object);
+      }
+    });
+  }
+  countLiElements();
+  hideGeneratedCards();
+}
+
+let searchResultCardCounter = 1;
+function generateSearchResultsCards(card) {
+  let li = document.createElement("li");
+  li.classList.add("card");
+  li.setAttribute("id", searchResultCardCounter);
+  li.innerHTML = `
+    <div class="card__image-container" data-js="card__image-container">
+  <img
+    class="card__image"
+    src="${card.image}"
+    alt="Picture of ${card.name}"
+    data-js="card__image"
+  />
+  <div class="card__image-gradient"></div>
+</div>
+<div class="card__content">
+  <h2 class="card__title" data-js="card__title">${card.name}</h2>
+  <dl class="card__info" data-js="card__info">
+    <dt class="card__info-title" >Status</dt>
+    <dd class="card__info-description" data-js="card__info_status">${card.status}</dd>
+    <dt class="card__info-title">Type</dt>
+    <dd class="card__info-description" data-js="card__info_type">${card.type}</dd>
+    <dt class="card__info-title">Occurrences</dt>
+    <dd class="card__info-description" data-js="card__info_Occurrences">${card.episode.length}</dd>
+  </dl>
+</div>
+    `;
+  searchResultCardCounter++;
+  ul.append(li);
+}
+
+//Hide all Cards that are more than 20
+async function hideGeneratedCards() {
+  let allGeneratedCards = document.getElementsByClassName("card");
+
+  if ((page = 1)) {
+    for (let genCards of allGeneratedCards) {
+      if (genCards.id > 20) {
+        genCards.classList.add("hidden");
+      }
+    }
+  } else if ((page = 2)) {
+    for (let genCards of allGeneratedCards) {
+      if (genCards.id < 21 || genCards.id > 40) {
+        genCards.classList.add("hidden");
+      } else if (genCards > 20 && genCards < 40) {
+        genCards.classList.remove("hidden");
+      }
+    }
+  }
+}
+
+// Get the number of LI Elements in the current document
+async function countLiElements() {
+  console.log(ul.childNodes.length);
+  pagination.innerHTML = page + " / " + Math.ceil(ul.childNodes.length / 20);
+  if (ul.childNodes.length <= 0) {
+    ul.innerHTML = `
+    <li class="card">
+    <div class="card__content">
+    <h2 class="card__title" data-js="card__title">404 - We did not find anything</h2>
+    <img src="https://staticdelivery.nexusmods.com/mods/1151/images/528-0-1447526230.png" width="250px">
+    </div>
+    </li>
+    `;
+  }
 }

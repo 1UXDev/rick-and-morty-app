@@ -1,3 +1,5 @@
+/* import { myFunction } from "../card/card.js";
+console.log("running");
 export let SearchQuery = "";
 
 export function SearchBar() {
@@ -11,4 +13,12 @@ export function SearchBar() {
     SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
     return;
   });
+
+  searchBarForm.addEventListener("input", (e) => {
+    e.preventDefault();
+    SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
+    myFunction(SearchQuery);
+    return;
+  });
 }
+ */
