@@ -1,21 +1,12 @@
-const card__image = document.querySelector('[data-js="card__image"]');
-const card__title = document.querySelector('[data-js="card__title"]');
-const card__info_status = document.querySelector(
-  '[data-js="card__info_status"]'
-);
-const card__info_type = document.querySelector('[data-js="card__info_type"]');
-const card__info_Occurrences = document.querySelector(
-  '[data-js="card__info_Occurrences"]'
-);
+let userSearched = false;
 const ul = document.querySelector('[data-js="card-container"]');
 
 // Nav Buttons
 let page = 1;
 const pagination = document.querySelector('[data-js="pagination"]');
 
-// Generating Cards
+// Generating Cards ------------------------------------------------------------------
 export async function generateCards() {
-  console.log(page);
   ul.innerHTML = "";
   const response = await fetch(
     `https://rickandmortyapi.com/api/character/?page=${page}`
@@ -25,6 +16,7 @@ export async function generateCards() {
   for (let object of jsonData.results) {
     let li = document.createElement("li");
     li.classList.add("card");
+    li.classList.add("animate");
     li.innerHTML = `
     <div class="card__image-container" data-js="card__image-container">
   <img
@@ -56,31 +48,64 @@ generateCards();
 let button_prev = document.getElementById("button_prev");
 let button_next = document.getElementById("button_next");
 
-button_prev.addEventListener("click", (event) => {
-  document.getElementById("button_prev").disabled = true;
-  if (page !== 1) {
-    page = page - 1;
-    pagination.innerHTML = page + " / " + 20;
+if ((userSearched = false)) {
+  // NEXT BUTTON
+  button_next.addEventListener("click", (event) => {
     document.getElementById("button_prev").disabled = false;
-  } else {
-    button_prev.setAttribute("class", "button disabled");
-    document.getElementById("button_prev").disabled = true;
-  }
-  generateCards();
-});
+    if (page !== 42) {
+      page = page + 1;
+      pagination.innerHTML = page + " / " + 42;
+      document.getElementById("button_next").disabled = false;
+    } else {
+      button_prev.setAttribute("class", "button disabled");
+      document.getElementById("button_next").disabled = true;
+    }
+    generateCards();
+  });
 
-button_next.addEventListener("click", (event) => {
-  document.getElementById("button_prev").disabled = false; //This enables prevbutton when next is clicked
-  if (page !== 20 - 1) {
-    page = page + 1;
-    pagination.innerHTML = page + " / " + 20;
-    document.getElementById("button_next").disabled = false;
-  } else {
-    button_prev.setAttribute("class", "button disabled");
-    document.getElementById("button_next").disabled = true;
-  }
-  generateCards();
-});
+  // PREV BUTTON
+  button_prev.addEventListener("click", (event) => {
+    document.getElementById("button_prev").disabled = true;
+    if (page !== 1) {
+      page = page - 1;
+      pagination.innerHTML = page + " / " + 42;
+      document.getElementById("button_prev").disabled = false;
+    } else {
+      button_prev.setAttribute("class", "button disabled");
+      document.getElementById("button_prev").disabled = true;
+    }
+    generateCards();
+  });
+} else {
+  // Buttons WHEN USER SEARCHED SOMETHING
+  // Next Button when user searched
+  button_next.addEventListener("click", () => {
+    document.getElementById("button_prev").disabled = false;
+    if (page >= ul.childNodes.length / 20) {
+      button_next.disabled = true;
+      button_next.classList.add("disabled");
+    } else {
+      page = page + 1;
+      pagination.innerHTML =
+        page + " / " + Math.ceil(ul.childNodes.length / 20);
+      hideGeneratedCards();
+    }
+  });
+
+  // Prev Button when user searched
+  button_prev.addEventListener("click", () => {
+    console.log(userSearched + "3-------------------");
+    if (page !== 1) {
+      page = page - 1;
+      pagination.innerHTML =
+        page + " / " + Math.ceil(ul.childNodes.length / 20);
+      hideGeneratedCards();
+    } else {
+      button_prev.setAttribute("class", "button disabled");
+      document.getElementById("button_prev").disabled = true;
+    }
+  });
+}
 
 // Search Bar -------------------------------------------------------------
 let SearchQuery = "";
@@ -97,19 +122,25 @@ export function SearchBar() {
     generateSearchResults(SearchQuery);
     searchBarForm.firstChild.nextElementSibling.value = "";
     page = 1;
+    userSearched = true;
+    ul.focus();
     return;
   });
 
-  searchBarForm.addEventListener("input", (e) => {
+  // Code for Typeahead Nav
+  /*   searchBarForm.addEventListener("input", (e) => {
     e.preventDefault();
     SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
     return;
-  });
+  }); */
 }
+
 SearchBar();
 
+// Generating Search Results from the API by Looping through the pages -----------------
 export async function generateSearchResults(value) {
   ul.innerHTML = "";
+  searchResultCardCounter = 1;
   // looping through the 20 pages of the API
   for (let i = 1; i <= 20; i++) {
     const response = await fetch(
@@ -119,7 +150,7 @@ export async function generateSearchResults(value) {
 
     jsonData.results.forEach((object) => {
       if (object.name.toLowerCase().includes(value.toLowerCase())) {
-        console.log(object.name);
+        //console.log(object.name);
         generateSearchResultsCards(object);
       }
     });
@@ -128,10 +159,13 @@ export async function generateSearchResults(value) {
   hideGeneratedCards();
 }
 
+// Generate the Cards from the SearchResult -------------------------------------------
 let searchResultCardCounter = 1;
+
 function generateSearchResultsCards(card) {
   let li = document.createElement("li");
   li.classList.add("card");
+  li.classList.add("animate");
   li.setAttribute("id", searchResultCardCounter);
   li.innerHTML = `
     <div class="card__image-container" data-js="card__image-container">
@@ -159,22 +193,33 @@ function generateSearchResultsCards(card) {
   ul.append(li);
 }
 
-//Hide all Cards that are more than 20
+//Hide all Cards that are more than 20 ------------------------------------------------
 async function hideGeneratedCards() {
   let allGeneratedCards = document.getElementsByClassName("card");
+  console.log("hide");
+  console.log(page);
 
-  if ((page = 1)) {
+  if (page === 1) {
     for (let genCards of allGeneratedCards) {
+      genCards.classList.remove("hidden");
       if (genCards.id > 20) {
         genCards.classList.add("hidden");
       }
     }
-  } else if ((page = 2)) {
+  } else if (page === 2) {
+    console.log(page);
     for (let genCards of allGeneratedCards) {
-      if (genCards.id < 21 || genCards.id > 40) {
+      genCards.classList.remove("hidden");
+      if (genCards.id >= 41 || genCards.id <= 20) {
         genCards.classList.add("hidden");
-      } else if (genCards > 20 && genCards < 40) {
-        genCards.classList.remove("hidden");
+      }
+    }
+  } else if (page === 3) {
+    console.log(page);
+    for (let genCards of allGeneratedCards) {
+      genCards.classList.remove("hidden");
+      if (genCards.id >= 61 || genCards.id <= 40) {
+        genCards.classList.add("hidden");
       }
     }
   }
@@ -182,7 +227,6 @@ async function hideGeneratedCards() {
 
 // Get the number of LI Elements in the current document
 async function countLiElements() {
-  console.log(ul.childNodes.length);
   pagination.innerHTML = page + " / " + Math.ceil(ul.childNodes.length / 20);
   if (ul.childNodes.length <= 0) {
     ul.innerHTML = `
