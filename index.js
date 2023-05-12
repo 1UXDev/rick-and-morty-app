@@ -48,65 +48,69 @@ generateCards();
 let button_prev = document.getElementById("button_prev");
 let button_next = document.getElementById("button_next");
 
-if ((userSearched = false)) {
-  // NEXT BUTTON
-  button_next.addEventListener("click", (event) => {
-    document.getElementById("button_prev").disabled = false;
-    if (page !== 42) {
-      page = page + 1;
-      pagination.innerHTML = page + " / " + 42;
-      document.getElementById("button_next").disabled = false;
-    } else {
-      button_prev.setAttribute("class", "button disabled");
-      document.getElementById("button_next").disabled = true;
-    }
-    generateCards();
-  });
-
-  // PREV BUTTON
-  button_prev.addEventListener("click", (event) => {
-    document.getElementById("button_prev").disabled = true;
-    if (page !== 1) {
-      page = page - 1;
-      pagination.innerHTML = page + " / " + 42;
+async function buttonListenerGenerator() {
+  if (userSearched == false) {
+    // NEXT BUTTON
+    button_next.addEventListener("click", (event) => {
       document.getElementById("button_prev").disabled = false;
-    } else {
-      button_prev.setAttribute("class", "button disabled");
-      document.getElementById("button_prev").disabled = true;
-    }
-    generateCards();
-  });
-} else {
-  // Buttons WHEN USER SEARCHED SOMETHING
-  // Next Button when user searched
-  button_next.addEventListener("click", () => {
-    document.getElementById("button_prev").disabled = false;
-    if (page >= ul.childNodes.length / 20) {
-      button_next.disabled = true;
-      button_next.classList.add("disabled");
-    } else {
-      page = page + 1;
-      pagination.innerHTML =
-        page + " / " + Math.ceil(ul.childNodes.length / 20);
-      hideGeneratedCards();
-    }
-  });
+      if (page !== 42) {
+        page = page + 1;
+        pagination.innerHTML = page + " / " + 42;
+        document.getElementById("button_next").disabled = false;
+      } else {
+        button_prev.setAttribute("class", "button disabled");
+        document.getElementById("button_next").disabled = true;
+      }
+      generateCards();
+    });
 
-  // Prev Button when user searched
-  button_prev.addEventListener("click", () => {
-    console.log(userSearched + "3-------------------");
-    if (page !== 1) {
-      page = page - 1;
-      pagination.innerHTML =
-        page + " / " + Math.ceil(ul.childNodes.length / 20);
-      hideGeneratedCards();
-    } else {
-      button_prev.setAttribute("class", "button disabled");
+    // PREV BUTTON
+    button_prev.addEventListener("click", (event) => {
       document.getElementById("button_prev").disabled = true;
-    }
-  });
+      if (page !== 1) {
+        page = page - 1;
+        pagination.innerHTML = page + " / " + 42;
+        document.getElementById("button_prev").disabled = false;
+      } else {
+        button_prev.setAttribute("class", "button disabled");
+        document.getElementById("button_prev").disabled = true;
+      }
+      generateCards();
+    });
+  } else {
+    // Buttons WHEN USER SEARCHED SOMETHING
+    // Next Button when user searched
+    console.dir(button_next);
+
+    button_next.addEventListener("click", () => {
+      document.getElementById("button_prev").disabled = false;
+      if (page >= ul.childNodes.length / 20) {
+        button_next.disabled = true;
+        button_next.classList.add("disabled");
+      } else {
+        page = page + 1;
+        pagination.innerHTML =
+          page + " / " + Math.ceil(ul.childNodes.length / 20);
+        hideGeneratedCards();
+      }
+    });
+
+    // Prev Button when user searched
+    button_prev.addEventListener("click", () => {
+      console.log(userSearched + "3-------------------");
+      if (page !== 1) {
+        page = page - 1;
+        pagination.innerHTML =
+          page + " / " + Math.ceil(ul.childNodes.length / 20);
+        hideGeneratedCards();
+      } else {
+        button_prev.setAttribute("class", "button disabled");
+        document.getElementById("button_prev").disabled = true;
+      }
+    });
+  }
 }
-
+buttonListenerGenerator();
 // Search Bar -------------------------------------------------------------
 let SearchQuery = "";
 
@@ -119,17 +123,15 @@ export function SearchBar() {
   searchBarForm.addEventListener("submit", (e) => {
     e.preventDefault();
     SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
-    if (SearchQuery === "") {
+    /* if (SearchQuery === "") {
       searchBarForm.classList.add("shake");
-    } else {
-      searchBarForm.classList.add("shake");
-      generateSearchResults(SearchQuery);
-      searchBarForm.firstChild.nextElementSibling.value = "";
-      page = 1;
-      userSearched = true;
-      ul.focus();
-    }
-    return;
+    } else { 
+      searchBarForm.classList.remove("shake");*/
+    generateSearchResults(SearchQuery);
+    searchBarForm.firstChild.nextElementSibling.value = "";
+    page = 1;
+    userSearched = true;
+    ul.focus();
   });
 
   // Code for Typeahead Nav
@@ -201,8 +203,7 @@ function generateSearchResultsCards(card) {
 //Hide all Cards that are more than 20 ------------------------------------------------
 async function hideGeneratedCards() {
   let allGeneratedCards = document.getElementsByClassName("card");
-  console.log("hide");
-  console.log(page);
+  buttonListenerGenerator();
 
   if (page === 1) {
     for (let genCards of allGeneratedCards) {
