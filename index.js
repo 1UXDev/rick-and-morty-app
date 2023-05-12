@@ -148,15 +148,16 @@ export function SearchBar() {
   searchBarForm.addEventListener("submit", (e) => {
     e.preventDefault();
     SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
-    /* if (SearchQuery === "") {
+    if (SearchQuery === "") {
       searchBarForm.classList.add("shake");
-    } else { 
-      searchBarForm.classList.remove("shake");*/
-    generateSearchResults(SearchQuery);
-    searchBarForm.firstChild.nextElementSibling.value = "";
-    page = 1;
-    userSearched = true;
-    ul.focus();
+    } else {
+      searchBarForm.classList.remove("shake");
+      generateSearchResults(SearchQuery);
+      searchBarForm.firstChild.nextElementSibling.value = "";
+      page = 1;
+      userSearched = true;
+      ul.focus();
+    }
   });
 
   // Code for Typeahead Nav
