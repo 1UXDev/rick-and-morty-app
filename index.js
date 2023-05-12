@@ -87,7 +87,6 @@ async function buttonListenerGenerator() {
         id="button_prev"
         pagination
         value="1"
-        disabled
       >
         previous
       </button>
@@ -109,7 +108,7 @@ async function buttonListenerGenerator() {
     // Next Button when user searched
     button_next.addEventListener("click", () => {
       console.log("im working");
-      document.getElementById("button_prev").disabled = false;
+      //    document.getElementById("button_prev").disabled = false;
       if (page >= ul.childNodes.length / 20) {
         button_next.disabled = true;
         button_next.classList.add("disabled");
@@ -123,8 +122,7 @@ async function buttonListenerGenerator() {
 
     // Prev Button when user searched
     button_prev.addEventListener("click", () => {
-      console.log(userSearched + "3-------------------");
-      if (page !== 1) {
+      if (page > 1) {
         page = page - 1;
         pagination.innerHTML =
           page + " / " + Math.ceil(ul.childNodes.length / 20);
