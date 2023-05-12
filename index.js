@@ -1,5 +1,6 @@
 let userSearched = false;
 const ul = document.querySelector('[data-js="card-container"]');
+const navigation = document.querySelector('[data-js="navigation"]');
 
 // Nav Buttons
 let page = 1;
@@ -65,8 +66,9 @@ async function buttonListenerGenerator() {
     });
 
     // PREV BUTTON
-    button_prev.addEventListener("click", (event) => {
+    button_prev.addEventListener("click", (e) => {
       document.getElementById("button_prev").disabled = true;
+      e.preventDefault();
       if (page !== 1) {
         page = page - 1;
         pagination.innerHTML = page + " / " + 42;
@@ -78,11 +80,35 @@ async function buttonListenerGenerator() {
       generateCards();
     });
   } else {
+    navigation.innerHTML = `
+    <button
+        class="button button--prev"
+        data-js="button_prev"
+        id="button_prev"
+        pagination
+        value="1"
+        disabled
+      >
+        previous
+      </button>
+      
+      <span class="navigation__pagination" data-js="pagination">${page} / ${Math.ceil(
+      ul.childNodes.length / 20
+    )}</span>
+      <button
+        class="button button--next"
+        data-js="button_next"
+        id="button_next"
+      >
+        next
+      </button>
+      `;
+    button_next = document.getElementById("button_next");
+    button_prev = document.getElementById("button_prev");
     // Buttons WHEN USER SEARCHED SOMETHING
     // Next Button when user searched
-    console.dir(button_next);
-
     button_next.addEventListener("click", () => {
+      console.log("im working");
       document.getElementById("button_prev").disabled = false;
       if (page >= ul.childNodes.length / 20) {
         button_next.disabled = true;
@@ -111,6 +137,7 @@ async function buttonListenerGenerator() {
   }
 }
 buttonListenerGenerator();
+
 // Search Bar -------------------------------------------------------------
 let SearchQuery = "";
 
