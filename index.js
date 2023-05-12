@@ -119,11 +119,16 @@ export function SearchBar() {
   searchBarForm.addEventListener("submit", (e) => {
     e.preventDefault();
     SearchQuery = searchBarForm.firstChild.nextElementSibling.value;
-    generateSearchResults(SearchQuery);
-    searchBarForm.firstChild.nextElementSibling.value = "";
-    page = 1;
-    userSearched = true;
-    ul.focus();
+    if (SearchQuery === "") {
+      searchBarForm.classList.add("shake");
+    } else {
+      searchBarForm.classList.add("shake");
+      generateSearchResults(SearchQuery);
+      searchBarForm.firstChild.nextElementSibling.value = "";
+      page = 1;
+      userSearched = true;
+      ul.focus();
+    }
     return;
   });
 
@@ -233,6 +238,7 @@ async function countLiElements() {
     <li class="card">
     <div class="card__content">
     <h2 class="card__title" data-js="card__title">404 - We did not find anything</h2>
+    <p>Please reload  </p>
     <img src="https://staticdelivery.nexusmods.com/mods/1151/images/528-0-1447526230.png" width="250px">
     </div>
     </li>
